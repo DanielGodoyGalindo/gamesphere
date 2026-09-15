@@ -38,3 +38,13 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export async function GET() {
+  try {
+    const allUsers = await prisma.user.findMany();
+    return NextResponse.json(allUsers, { status: 200 });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: "Internal error from server" }, { status: 500 });
+  }
+}
