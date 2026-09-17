@@ -26,5 +26,5 @@ C:\PostgreSQL\pgsql\bin\psql.exe -U postgres -d gamesphere
 POST   /api/users ✅
 GET    /api/users ✅
 GET    /api/users/:id ✅
-PATCH  /api/users/:id
-DELETE /api/users/:id
+PATCH  /api/users/:id ✅
+DELETE /api/users/:id ✅

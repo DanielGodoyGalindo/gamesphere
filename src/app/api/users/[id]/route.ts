@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 // https://nextjs.org/docs/app/api-reference/file-conventions/route#context-optional
 // https://www.prisma.io/docs/orm/v6/prisma-client/queries/crud#read
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> }) {
   try {
 
@@ -12,17 +12,17 @@ export async function GET(
     const { id } = await params;
     const userId = Number(id)
     if (!Number.isInteger(userId) || userId <= 0)
-      return NextResponse.json({ error: "Id required", status: 400 });
+      return NextResponse.json({ error: "Id required" }, { status: 400 });
 
     // Found user with received id
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user)
-      return NextResponse.json({ error: "User not found", status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     return NextResponse.json(user, { status: 200 });
 
   } catch (e) {
     console.error(e);
-    return NextResponse.json({ error: "Internal server error: " }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -55,5 +55,22 @@ export async function PATCH(
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: "Internal server error: " }, { status: 500 });
+  }
+}
+
+export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const userId = Number(id)
+    if (!Number.isInteger(userId) || userId <= 0)
+      return NextResponse.json({ error: "Id required" }, { status: 400 });
+    const userFound = await prisma.user.findUnique({ where: { id: userId } });
+    if (!userFound)
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    const deletedUser = await prisma.user.delete({ where: { id: userId } })
+    return NextResponse.json(deletedUser, { status: 200 });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
