@@ -19,6 +19,19 @@ Execute
 C:\PostgreSQL\pgsql\bin\psql.exe -U postgres -d gamesphere
 ```
 
+
+* Prisma
+1) Create model
+2) Regenerate Prisma Client
+3) Create migration and DB table for model (with name exampleModel)
+4) Check in Prisma Studio
+```
+1) Add model in prisma\schema.prisma
+2) (bash) npx prisma generate
+3) (bash) npx prisma migrate dev --name create_exampleModel
+4) (bash) npx prisma studio
+```
+
 ## TO-DO
 
 ### Database
