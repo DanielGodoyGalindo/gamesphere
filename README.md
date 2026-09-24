@@ -55,8 +55,8 @@ C:\PostgreSQL\pgsql\bin\psql.exe -U postgres -d gamesphere
 
 - [x] POST    `/api/games`
 - [x] GET     `/api/games`
-- [ ] GET     `/api/games/:id`
-- [ ] PATCH   `/api/games/:id`
+- [x] GET     `/api/games/:id`
+- [x] PATCH   `/api/games/:id`
 - [ ] DELETE  `/api/games/:id`
 
 ### Endpoints — Library
