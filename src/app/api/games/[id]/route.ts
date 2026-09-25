@@ -55,3 +55,20 @@ export async function PATCH(
     return NextResponse.json({ error: "Internal server error: " }, { status: 500 });
   }
 }
+
+export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const gameID = Number(id)
+    if (!Number.isInteger(gameID) || gameID <= 0)
+      return NextResponse.json({ error: "Id required" }, { status: 400 });
+    const gameFound = await prisma.game.findUnique({ where: { id: gameID } });
+    if (!gameFound)
+      return NextResponse.json({ error: "Game not found" }, { status: 404 });
+    const deletedGame = await prisma.game.delete({ where: { id: gameID } })
+    return NextResponse.json(deletedGame, { status: 200 });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
