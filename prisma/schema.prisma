@@ -18,6 +18,7 @@ model User {
   email     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  libraries Library[]
 }
 
 model Game {
@@ -30,4 +31,18 @@ model Game {
   rating      Float?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  libraries Library[]
+}
+
+model Library {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  gameId    Int
+  status    String   @default("WANT_TO_PLAY")
+  progress  Int      @default(0)
+  user      User     @relation(fields: [userId], references: [id])
+  game      Game     @relation(fields: [gameId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([userId, gameId])
 }
