@@ -62,8 +62,8 @@ C:\PostgreSQL\pgsql\bin\psql.exe -U postgres -d gamesphere
 ### Endpoints — Library
 
 - [x] POST    `/api/library`
-- [ ] GET     `/api/users/:id/library`
-- [ ] GET     `/api/library/:id`
+- [x] GET     `/api/users/:id/library`
+- [x] GET     `/api/library/:id`
 - [ ] PATCH   `/api/library/:id`
 - [ ] DELETE  `/api/library/:id`
 
