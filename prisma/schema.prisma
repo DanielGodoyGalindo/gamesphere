@@ -19,6 +19,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   libraries Library[]
+  reviews   Review[]
 }
 
 model Game {
@@ -32,6 +33,7 @@ model Game {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   libraries Library[]
+  reviews   Review[]
 }
 
 model Library {
@@ -44,5 +46,21 @@ model Library {
   game      Game     @relation(fields: [gameId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@unique([userId, gameId])
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  gameId    Int
+  rating    Int
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+  game Game @relation(fields: [gameId], references: [id])
+
   @@unique([userId, gameId])
 }
