@@ -70,7 +70,7 @@ C:\PostgreSQL\pgsql\bin\psql.exe -U postgres -d gamesphere
 ### Endpoints — Reviews
 
 - [x] POST    `/api/reviews`
-- [ ] GET     `/api/games/:id/reviews`
+- [x] GET     `/api/games/:id/reviews`
 - [ ] GET     `/api/reviews/:id`
 - [ ] PATCH   `/api/reviews/:id`
 - [ ] DELETE  `/api/reviews/:id`
