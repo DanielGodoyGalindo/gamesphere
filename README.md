@@ -71,7 +71,7 @@ C:\PostgreSQL\pgsql\bin\psql.exe -U postgres -d gamesphere
 
 - [x] POST    `/api/reviews`
 - [x] GET     `/api/games/:id/reviews`
-- [ ] GET     `/api/reviews/:id`
+- [x] GET     `/api/reviews/:id`
 - [ ] PATCH   `/api/reviews/:id`
 - [ ] DELETE  `/api/reviews/:id`
 
