@@ -77,11 +77,11 @@ C:\PostgreSQL\pgsql\bin\psql.exe -U postgres -d gamesphere
 
 ### Validation
 
-- [ ] Validate request data
-- [ ] Validate `username`
-- [ ] Validate `email`
-- [ ] Validate IDs
-- [ ] Validate required fields
+- [x] Validate request data
+- [x] Validate `username`
+- [x] Validate `email`
+- [x] Validate IDs
+- [x] Validate required fields
 - [ ] Handle unique constraint errors
 - [ ] Add Zod
 

@@ -7,35 +7,41 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { username, email } = body;
 
-    // Check if recieved data is ok
-    if (!username || !email) {
-      return NextResponse.json(
-        { error: "Username and email are mandatory" },
-        { status: 400 }
-      );
-    }
-    // Check if user or email already exist
+    // Validate required fields
+    if (username === undefined || email === undefined)
+      return NextResponse.json({ error: "Username and email are mandatory" }, { status: 400 });
+    // Validate username
+    if (typeof username !== "string" || username.trim() === "")
+      return NextResponse.json({ error: "Invalid username" }, { status: 400 });
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (typeof email !== "string" || email.trim() === "" || !emailRegex.test(email.trim()))
+      return NextResponse.json({ error: "Invalid email" }, { status: 400 });
+    // Normalize values
+    const normalizedUsername = username.trim();
+    const normalizedEmail = email.trim();
+    // Check if username or email already exists
     const existingUser = await prisma.user.findFirst({
-      where: { OR: [{ username }, { email }], },
+      where: {
+        OR: [
+          { username: normalizedUsername },
+          { email: normalizedEmail }
+        ]
+      }
     });
-    if (existingUser) {
-      return NextResponse.json(
-        { error: "Username or email already exist" },
-        { status: 409 }
-      );
-    }
+    if (existingUser)
+      return NextResponse.json({ error: "Username or email already exists" }, { status: 409 });
     // Create user
     const user = await prisma.user.create({
-      data: { username, email, },
+      data: {
+        username: normalizedUsername,
+        email: normalizedEmail
+      }
     });
     return NextResponse.json(user, { status: 201 });
-
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { error: "Internal error from server" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal error from server" }, { status: 500 });
   }
 }
 

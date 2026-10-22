@@ -35,11 +35,19 @@ export async function PATCH(
     const { username, email } = body;
     const { id } = await params;
     const userId = Number(id)
-    // Ensure a field
-    if (username === undefined && email === undefined)
-      return NextResponse.json({ error: "At least one field is required" }, { status: 400 });
+    // Validate ID
     if (!Number.isInteger(userId) || userId <= 0)
       return NextResponse.json({ error: "Id required" }, { status: 400 });
+    // Ensure at least 1 field is provided
+    if (username === undefined && email === undefined)
+      return NextResponse.json({ error: "At least one field is required" }, { status: 400 });
+    // Validate username only if provided
+    if (username !== undefined && (typeof username !== "string" || username.trim() === ""))
+      return NextResponse.json({ error: "Invalid 'username'" }, { status: 400 });
+    // Validate email only if provided
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (email !== undefined && (typeof email !== "string" || email.trim() === "" || !emailRegex.test(email.trim())))
+      return NextResponse.json({ error: "Invalid 'email'" }, { status: 400 });
     // Find user
     const userFound = await prisma.user.findUnique({ where: { id: userId } });
     if (!userFound)
@@ -47,8 +55,8 @@ export async function PATCH(
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
-        ...(username !== undefined && { username }),
-        ...(email !== undefined && { email }),
+        ...(username !== undefined && { username: username.trim() }),
+        ...(email !== undefined && { email: email.trim() }),
       }
     })
     return NextResponse.json(updatedUser, { status: 200 });
