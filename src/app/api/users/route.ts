@@ -1,31 +1,21 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { createUserSchema } from "@/schemas/user.schema";
 
 export async function POST(request: Request) {
   try {
-
     const body = await request.json();
-    const { username, email } = body;
+    const validation = createUserSchema.safeParse(body);
+    if (!validation.success)
+      return NextResponse.json({ error: validation.error.issues }, { status: 400 });
+    const { username, email } = validation.data;
 
-    // Validate required fields
-    if (username === undefined || email === undefined)
-      return NextResponse.json({ error: "Username and email are mandatory" }, { status: 400 });
-    // Validate username
-    if (typeof username !== "string" || username.trim() === "")
-      return NextResponse.json({ error: "Invalid username" }, { status: 400 });
-    // Validate email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (typeof email !== "string" || email.trim() === "" || !emailRegex.test(email.trim()))
-      return NextResponse.json({ error: "Invalid email" }, { status: 400 });
-    // Normalize values
-    const normalizedUsername = username.trim();
-    const normalizedEmail = email.trim();
     // Check if username or email already exists
     const existingUser = await prisma.user.findFirst({
       where: {
         OR: [
-          { username: normalizedUsername },
-          { email: normalizedEmail }
+          { username: username },
+          { email: email }
         ]
       }
     });
@@ -34,8 +24,8 @@ export async function POST(request: Request) {
     // Create user
     const user = await prisma.user.create({
       data: {
-        username: normalizedUsername,
-        email: normalizedEmail
+        username: username,
+        email: email
       }
     });
     return NextResponse.json(user, { status: 201 });
