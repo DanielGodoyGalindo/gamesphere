@@ -41,6 +41,8 @@ export async function POST(request: Request) {
     return NextResponse.json(user, { status: 201 });
   } catch (err) {
     console.error(err);
+    if (typeof err === "object" && err !== null && "code" in err && err.code === "P2002")
+      return NextResponse.json({ error: "Username or email already exists" }, { status: 409 });
     return NextResponse.json({ error: "Internal error from server" }, { status: 500 });
   }
 }
