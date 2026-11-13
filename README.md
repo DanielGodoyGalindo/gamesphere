@@ -86,7 +86,7 @@ C:\PostgreSQL\pgsql\bin\psql.exe -U postgres -d gamesphere
 - [ ] Add Zod
   - [x] User Schema
   - [x] Game Schema
-  - [ ] Library Schema
+  - [x] Library Schema
   - [ ] Review Schema
 
 ### Authentication
