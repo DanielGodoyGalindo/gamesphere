@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { updateReviewSchema } from "@/schemas/review.schema";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -42,26 +43,20 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = await params;
-    const reviewId = Number(id);
+
     const body = await request.json();
-    const { rating, title, content } = body;
-
-    if (!Number.isInteger(reviewId) || reviewId <= 0)
-      return NextResponse.json({ error: "Invalid review ID" }, { status: 400 });
-
-    if (rating === undefined && title === undefined && content === undefined)
+    const validation = updateReviewSchema.safeParse(body);
+    if (!validation.success)
+      return NextResponse.json({ error: validation.error.issues }, { status: 400 });
+    if (Object.keys(validation.data).length === 0)
       return NextResponse.json({ error: "At least one field is required" }, { status: 400 });
 
-    if (rating !== undefined && (!Number.isInteger(rating) || rating < 1 || rating > 10))
-      return NextResponse.json({ error: "Rating must be an integer between 1 and 10" }, { status: 400 });
+    const { rating, title, content } = validation.data;
 
-    if (title !== undefined && (typeof title !== "string" || title.trim().length === 0))
-      return NextResponse.json({ error: "Title cannot be empty" }, { status: 400 });
-
-    if (content !== undefined && (typeof content !== "string" || content.trim().length === 0))
-      return NextResponse.json({ error: "Content cannot be empty" }, { status: 400 });
-
+    const { id } = await params;
+    const reviewId = Number(id);
+    if (!Number.isInteger(reviewId) || reviewId <= 0)
+      return NextResponse.json({ error: "Invalid review ID" }, { status: 400 });
     const existingReview = await prisma.review.findUnique({ where: { id: reviewId } });
     if (!existingReview)
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
@@ -70,8 +65,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       where: { id: reviewId },
       data: {
         ...(rating !== undefined && { rating }),
-        ...(title !== undefined && { title: title.trim() }),
-        ...(content !== undefined && { content: content.trim() })
+        ...(title !== undefined && { title }),
+        ...(content !== undefined && { content })
       }
     });
     return NextResponse.json(updatedReview, { status: 200 });

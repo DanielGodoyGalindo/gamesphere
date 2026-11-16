@@ -83,11 +83,11 @@ C:\PostgreSQL\pgsql\bin\psql.exe -U postgres -d gamesphere
 - [x] Validate IDs
 - [x] Validate required fields
 - [x] Handle unique constraint errors
-- [ ] Add Zod
+- [x] Add Zod
   - [x] User Schema
   - [x] Game Schema
   - [x] Library Schema
-  - [ ] Review Schema
+  - [x] Review Schema
 
 ### Authentication
 
