@@ -1,14 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { createUserSchema } from "@/schemas/user.schema";
+import bcrypt from "bcryptjs";
+import { registerUserSchema } from "@/schemas/user.schema";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const validation = createUserSchema.safeParse(body);
+    const validation = registerUserSchema.safeParse(body);
     if (!validation.success)
       return NextResponse.json({ error: validation.error.issues }, { status: 400 });
-    const { username, email } = validation.data;
+    const { username, email, password } = validation.data;
 
     // Check if username or email already exists
     const existingUser = await prisma.user.findFirst({
@@ -22,10 +24,19 @@ export async function POST(request: Request) {
     if (existingUser)
       return NextResponse.json({ error: "Username or email already exists" }, { status: 409 });
     // Create user
+    const passwordHash = await bcrypt.hash(password, 12);
     const user = await prisma.user.create({
       data: {
-        username: username,
-        email: email
+        username,
+        email,
+        passwordHash
+      },
+      select: { // return safe fields
+        id: true,
+        username: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true
       }
     });
     return NextResponse.json(user, { status: 201 });

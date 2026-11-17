@@ -8,3 +8,7 @@ export const createUserSchema = z.object({
 });
 
 export const updateUserSchema = createUserSchema.partial();
+
+export const registerUserSchema = createUserSchema.extend({
+  password: z.string().min(8, "Password must contain at least 8 characters")
+});
