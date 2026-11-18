@@ -7,7 +7,7 @@ export const createUserSchema = z.object({
   email: z.email("Invalid email").trim()
 });
 
-export const updateUserSchema = createUserSchema.partial();
+export const updateUserSchema = createUserSchema.partial().strict();
 
 export const registerUserSchema = createUserSchema.extend({
   password: z.string().min(8, "Password must contain at least 8 characters")

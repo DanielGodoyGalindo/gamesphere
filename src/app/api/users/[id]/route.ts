@@ -42,6 +42,7 @@ export async function PATCH(
     const validation = updateUserSchema.safeParse(body);
     if (!validation.success)
       return NextResponse.json({ error: validation.error.issues }, { status: 400 });
+    const { username, email } = validation.data;
     // Ensure at least 1 field is provided
     if (Object.keys(validation.data).length === 0)
       return NextResponse.json({ error: "At least one field is required" }, { status: 400 });
@@ -52,7 +53,17 @@ export async function PATCH(
     // Update user
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: validation.data
+      data: {
+        ...(username !== undefined && { username }),
+        ...(email !== undefined && { email })
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true
+      }
     })
     return NextResponse.json(updatedUser, { status: 200 });
   } catch (e) {
