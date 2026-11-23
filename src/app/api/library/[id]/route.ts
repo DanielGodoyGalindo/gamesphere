@@ -6,11 +6,16 @@ import { updateLibrarySchema } from "@/schemas/library.schema";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    // Check authentication
+    const user = await getCurrentUser();
+    if (!user)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const userId = Number(user.id);
     const { id } = await params;
     const libraryId = Number(id);
     if (!Number.isInteger(libraryId) || libraryId <= 0)
       return NextResponse.json({ error: "Invalid library ID" }, { status: 400 });
-    const foundLibrary = await prisma.library.findUnique({ where: { id: libraryId }, include: { game: true } });
+    const foundLibrary = await prisma.library.findUnique({ where: { id: libraryId, userId: userId }, include: { game: true } });
     if (!foundLibrary)
       return NextResponse.json({ error: "Library not found" }, { status: 404 });
     return NextResponse.json(foundLibrary, { status: 200 });
@@ -22,14 +27,19 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    // Check authentication
+    const user = await getCurrentUser();
+    if (!user)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const userId = Number(user.id);
     const { id } = await params;
     const libraryId = Number(id);
     if (!Number.isInteger(libraryId) || libraryId <= 0)
       return NextResponse.json({ error: "Invalid library ID" }, { status: 400 });
-    const foundLibrary = await prisma.library.findUnique({ where: { id: libraryId } });
+    const foundLibrary = await prisma.library.findUnique({ where: { id: libraryId, userId: userId } });
     if (!foundLibrary)
       return NextResponse.json({ error: "Library not found" }, { status: 404 });
-    const deletedLibrary = await prisma.library.delete({ where: { id: libraryId } });
+    const deletedLibrary = await prisma.library.delete({ where: { id: libraryId, userId: userId } });
     return NextResponse.json(deletedLibrary, { status: 200 });
   } catch (e) {
     console.error(e);

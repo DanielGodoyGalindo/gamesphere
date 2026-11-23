@@ -1,15 +1,23 @@
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/session";
 import { NextResponse } from "next/server";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    // Check authentication
+    const user = await getCurrentUser();
+    if (!user)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const userId = Number(user.id);
     const { id } = await params;
-    const userId = Number(id);
+    const paramUserId = Number(id);
     if (!Number.isInteger(userId) || userId <= 0)
-      return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
-    const existingUser = await prisma.user.findUnique({where: { id: userId }});
-    if (!existingUser)
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "Invalid authenticated user ID" }, { status: 400 });
+    if (!Number.isInteger(paramUserId) || paramUserId <= 0)
+      return NextResponse.json({ error: "Invalid param user ID" }, { status: 400 });
+    if (paramUserId !== userId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     // Find libraries for user (including games in each library)
     const library = await prisma.library.findMany({
       where: { userId: userId },

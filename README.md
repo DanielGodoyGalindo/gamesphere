@@ -32,6 +32,12 @@ C:\PostgreSQL\pgsql\bin\psql.exe -U postgres -d gamesphere
 4) (bash) npx prisma studio
 ```
 
+* Authentication / access testing
+```
+testuser1 --> auth
+testuser2 --> properties and access
+```
+
 ## TO-DO
 
 ### Database
