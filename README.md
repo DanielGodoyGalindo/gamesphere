@@ -38,6 +38,13 @@ testuser1 --> auth
 testuser2 --> properties and access
 ```
 
+* Testing / Postman
+```
+GET http://localhost:3000/api/auth/csrf --> csrfToken
+POST http://localhost:3000/api/auth/callback/credentials --> body x-www-form-urlenconded --> email, password, csrfToken
+GET http://localhost:3000/api/auth/session --> user auth info
+```
+
 ## TO-DO
 
 ### Database
@@ -98,6 +105,10 @@ testuser2 --> properties and access
 ### Authentication
 
 - [ ] Configure Auth.js
+  - [ ] Update Review endpoints (to-do next)
+  - [ ] Update User endpoints
+  - [x] Update Library endpoints
+  - [ ] Update Games endpoints
 - [ ] User registration
 - [ ] User login
 - [ ] User logout

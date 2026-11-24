@@ -1,18 +1,19 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { createReviewSchema } from "@/schemas/review.schema";
+import { getCurrentUser } from "@/lib/session";
 
 export async function POST(request: Request) {
   try {
+    const user = await getCurrentUser();
+    if (!user)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const userId = Number(user.id);
     const body = await request.json();
     const validation = createReviewSchema.safeParse(body);
     if (!validation.success)
       return NextResponse.json({ error: validation.error.issues }, { status: 400 });
-    
-    const { userId, gameId, rating, title, content } = validation.data;
-    const existingUser = await prisma.user.findUnique({ where: { id: userId } });
-    if (!existingUser)
-      return NextResponse.json({ error: "User ID not found" }, { status: 404 });
+    const { gameId, rating, title, content } = validation.data;
     const existingGame = await prisma.game.findUnique({ where: { id: gameId } });
     if (!existingGame)
       return NextResponse.json({ error: "Game ID not found" }, { status: 404 });
