@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { updateReviewSchema } from "@/schemas/review.schema";
+import { getCurrentUser } from "@/lib/session";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -26,14 +27,20 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const user = await getCurrentUser();
+    if (!user)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const userId = Number(user.id);
+    if (!Number.isInteger(userId) || userId <= 0)
+      return NextResponse.json({ error: "Invalid authenticated user ID" }, { status: 400 });
     const { id } = await params;
     const reviewId = Number(id);
     if (!Number.isInteger(reviewId) || reviewId <= 0)
       return NextResponse.json({ error: "Invalid review ID" }, { status: 400 });
-    const existingReview = await prisma.review.findUnique({ where: { id: reviewId } });
+    const existingReview = await prisma.review.findUnique({ where: { id: reviewId, userId: userId } });
     if (!existingReview)
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
-    const deletedReview = await prisma.review.delete({ where: { id: reviewId } });
+    const deletedReview = await prisma.review.delete({ where: { id: reviewId, userId: userId } });
     return NextResponse.json(deletedReview, { status: 200 });
   } catch (e) {
     console.error(e);
@@ -43,7 +50,12 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-
+    const user = await getCurrentUser();
+    if (!user)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const userId = Number(user.id);
+    if (!Number.isInteger(userId) || userId <= 0)
+      return NextResponse.json({ error: "Invalid authenticated user ID" }, { status: 400 });
     const body = await request.json();
     const validation = updateReviewSchema.safeParse(body);
     if (!validation.success)
@@ -52,17 +64,16 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "At least one field is required" }, { status: 400 });
 
     const { rating, title, content } = validation.data;
-
     const { id } = await params;
     const reviewId = Number(id);
     if (!Number.isInteger(reviewId) || reviewId <= 0)
       return NextResponse.json({ error: "Invalid review ID" }, { status: 400 });
-    const existingReview = await prisma.review.findUnique({ where: { id: reviewId } });
+    const existingReview = await prisma.review.findUnique({ where: { id: reviewId, userId: userId } });
     if (!existingReview)
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
 
     const updatedReview = await prisma.review.update({
-      where: { id: reviewId },
+      where: { id: reviewId, userId: userId },
       data: {
         ...(rating !== undefined && { rating }),
         ...(title !== undefined && { title }),
