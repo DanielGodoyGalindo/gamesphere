@@ -104,11 +104,10 @@ GET http://localhost:3000/api/auth/session --> user auth info
 
 ### Authentication
 
-- [ ] Configure Auth.js
-  - [ ] Update Review endpoints (to-do next)
-  - [ ] Update User endpoints
+- [x] Configure Auth.js
+  - [x] Update Review endpoints
+  - [x] Update User endpoints (to-do next)
   - [x] Update Library endpoints
-  - [ ] Update Games endpoints
 - [ ] User registration
 - [ ] User login
 - [ ] User logout
